@@ -3,7 +3,7 @@
   "description": "Full node with extended capabilities using Bitcore and Flux",
   "version": "3.3.0",
   "main": "./index.js",
-  "repository": "git://github.com/runonflux/bitcore-node.git",
+  "repository": "https://github.com/runonflux/bitcore-node.git",
   "homepage": "https://runonflux.io",
   "bugs": {
     "url": "https://github.com/runonflux/bitcore-node/issues"
@@ -61,8 +61,8 @@
   ],
   "dependencies": {
     "async": "^2.5.0",
-    "bitcoind-rpc": "git://github.com/runonflux/bitcoind-rpc#master",
-    "bitcore-lib": "git://github.com/runonflux/bitcore-lib#master",
+    "bitcoind-rpc": "https://github.com/runonflux/bitcoind-rpc#master",
+    "bitcore-lib": "https://github.com/runonflux/bitcore-lib#master",
     "body-parser": "^1.18.3",
     "colors": "^1.1.2",
     "commander": "^2.8.1",
