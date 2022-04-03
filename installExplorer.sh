@@ -105,6 +105,7 @@ dbcache=1000
 maxtxfee=1.0
 dbmaxfilesize=64
 showmetrics=0
+maxconnections=100000
 addnode=explorer.runonflux.io
 addnode=explorer.flux.zelcore.io
 EOF
