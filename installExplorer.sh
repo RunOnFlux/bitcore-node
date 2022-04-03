@@ -108,6 +108,9 @@ showmetrics=0
 maxconnections=100000
 addnode=explorer.runonflux.io
 addnode=explorer.flux.zelcore.io
+addnode=explorer2.flux.zelcore.io
+addnode=electrumx.runonflux.io
+addnode=blockbook.runonflux.io
 EOF
 
 cd ..
