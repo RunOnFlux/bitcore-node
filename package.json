@@ -62,7 +62,7 @@
   "dependencies": {
     "async": "^2.5.0",
     "bitcoind-rpc": "https://github.com/runonflux/bitcoind-rpc#master",
-    "bitcore-lib": "https://github.com/runonflux/bitcore-lib#master",
+    "bitcore-lib": "https://github.com/runonflux/bitcore-lib#v6-transactions",
     "body-parser": "^1.18.3",
     "colors": "^1.1.2",
     "commander": "^2.8.1",
