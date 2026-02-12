@@ -71,7 +71,7 @@
     "liftoff": "^2.2.0",
     "lru-cache": "^4.0.1",
     "mkdirp": "0.5.1",
-    "npm": "^2.14.1",
+    "npm": "^6.13.6",
     "path-is-absolute": "^1.0.0",
     "semver": "^5.0.1",
     "socket.io": "^2.1.1",
