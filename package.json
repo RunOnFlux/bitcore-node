@@ -83,7 +83,7 @@
     "utf-8-validate": "~4.0.1"
   },
   "devDependencies": {
-    "benchmark": "1.0.0",
+    "benchmark": "2.1.4",
     "bitcore-p2p": "^1.1.0",
     "chai": "^3.5.0",
     "coveralls": "^2.11.9",
