@@ -65,7 +65,7 @@
     "bitcore-lib": "https://github.com/runonflux/bitcore-lib#master",
     "body-parser": "^1.18.3",
     "colors": "^1.1.2",
-    "commander": "^2.8.1",
+    "commander": "^4.1.0",
     "errno": "^0.1.4",
     "express": "^4.16.3",
     "liftoff": "^2.2.0",
