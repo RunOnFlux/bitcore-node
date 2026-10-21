@@ -4941,6 +4941,37 @@ describe('Bitcoin Service', function() {
     });
   });
 
+  describe('#getBlockReward', function() {
+    var bitcoind;
+    before(function() {
+      bitcoind = new BitcoinService(baseConfig);
+    });
+    it('will give pre-PON subsidy with halvings capped at 2', function() {
+      bitcoind.getBlockReward(5000).should.equal(150 * 1e8);
+      bitcoind.getBlockReward(657850).should.equal(75 * 1e8);
+      bitcoind.getBlockReward(1313200).should.equal(37.5 * 1e8);
+      bitcoind.getBlockReward(1968550).should.equal(37.5 * 1e8);
+      bitcoind.getBlockReward(2019999).should.equal(37.5 * 1e8);
+    });
+    it('will give 14 FLUX PON subsidy before the first reduction', function() {
+      bitcoind.getBlockReward(2020000).should.equal(1400000000);
+      bitcoind.getBlockReward(3050840).should.equal(1400000000);
+      bitcoind.getBlockReward(3071199).should.equal(1400000000);
+    });
+    it('will reduce the PON subsidy by 10% every 1051200 blocks', function() {
+      bitcoind.getBlockReward(3071200).should.equal(1260000000);
+      bitcoind.getBlockReward(4122399).should.equal(1260000000);
+      bitcoind.getBlockReward(4122400).should.equal(1134000000);
+    });
+    it('will stop reducing the PON subsidy after 20 reductions', function() {
+      var maxReductionHeight = 2020000 + 20 * 1051200;
+      bitcoind.getBlockReward(maxReductionHeight - 1).should.equal(189119237);
+      bitcoind.getBlockReward(maxReductionHeight).should.equal(170207313);
+      bitcoind.getBlockReward(maxReductionHeight + 1).should.equal(170207313);
+      bitcoind.getBlockReward(maxReductionHeight + 5 * 1051200).should.equal(170207313);
+    });
+  });
+
   describe('#generateBlock', function() {
     it('will give rpc error', function(done) {
       var bitcoind = new BitcoinService(baseConfig);
