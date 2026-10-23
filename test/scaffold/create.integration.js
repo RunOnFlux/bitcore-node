@@ -19,8 +19,6 @@ var create = proxyquire('../../lib/scaffold/create', {
   }
 });
 var fs = require('fs');
-var mkdirp = require('mkdirp');
-var rimraf = require('rimraf');
 
 describe('#create', function() {
 
@@ -29,11 +27,11 @@ describe('#create', function() {
 
   before(function(done) {
     // setup testing directories
-    mkdirp(testDir, function(err) {
+    fs.mkdir(testDir, {recursive: true}, function(err) {
       if (err) {
         throw err;
       }
-      mkdirp(testDir + '/.flux', function(err) {
+      fs.mkdir(testDir + '/.flux', {recursive: true}, function(err) {
         if (err) {
           throw err;
         }
@@ -44,7 +42,7 @@ describe('#create', function() {
 
   after(function(done) {
     // cleanup testing directories
-    rimraf(testDir, function(err) {
+    fs.rm(testDir, {recursive: true, force: true}, function(err) {
       if (err) {
         throw err;
       }

@@ -5,8 +5,6 @@ var sinon = require('sinon');
 var path = require('path');
 var fs = require('fs');
 var proxyquire = require('proxyquire');
-var mkdirp = require('mkdirp');
-var rimraf = require('rimraf');
 var add = require('../../lib/scaffold/add');
 
 describe('#add', function() {
@@ -20,7 +18,7 @@ describe('#add', function() {
   var startPackage = {};
 
   before(function(done) {
-    mkdirp(testDir + '/s0/s1', function(err) {
+    fs.mkdir(testDir + '/s0/s1', {recursive: true}, function(err) {
       if (err) {
         throw err;
       }
@@ -43,7 +41,7 @@ describe('#add', function() {
 
   after(function(done) {
     // cleanup testing directories
-    rimraf(testDir, function(err) {
+    fs.rm(testDir, {recursive: true, force: true}, function(err) {
       if (err) {
         throw err;
       }

@@ -227,7 +227,7 @@ describe('Bitcore Node', function() {
   });
 
   describe('#_startService', function() {
-    var sandbox = sinon.sandbox.create();
+    var sandbox = sinon.createSandbox();
     beforeEach(function() {
       sandbox.stub(log, 'info');
     });
@@ -306,7 +306,7 @@ describe('Bitcore Node', function() {
   });
 
   describe('#start', function() {
-    var sandbox = sinon.sandbox.create();
+    var sandbox = sinon.createSandbox();
     beforeEach(function() {
       sandbox.stub(log, 'info');
     });
@@ -448,7 +448,7 @@ describe('Bitcore Node', function() {
   });
 
   describe('#stop', function() {
-    var sandbox = sinon.sandbox.create();
+    var sandbox = sinon.createSandbox();
     beforeEach(function() {
       sandbox.stub(log, 'info');
     });

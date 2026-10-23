@@ -54,8 +54,8 @@ describe('WebService', function() {
 
   describe('#start', function() {
     beforeEach(function() {
-      httpStub.createServer.reset();
-      httpsStub.createServer.reset();
+      httpStub.createServer.resetHistory();
+      httpsStub.createServer.resetHistory();
     });
     it('should create an http server if no options are specified and node is not configured for https', function(done) {
       var web = new WebService({node: defaultNode});
@@ -91,13 +91,14 @@ describe('WebService', function() {
         },
         fs: fsStub,
         express: sinon.stub().returns({
-          use: sinon.stub()
+          use: sinon.stub(),
+          set: sinon.stub()
         }),
         'body-parser': {
           json: jsonStub
         },
         'socket.io': {
-          listen: sinon.stub().returns({
+          Server: sinon.stub().returns({
             on: sinon.stub()
           })
         }
@@ -108,7 +109,60 @@ describe('WebService', function() {
           return done(err);
         }
         jsonStub.callCount.should.equal(1);
-        jsonStub.args[0][0].limit.should.equal('100kb');
+        jsonStub.args[0][0].limit.should.equal('2000kb');
+        done();
+      });
+    });
+    it('should accept Engine.IO v3 clients from every origin', function(done) {
+      var node = new EventEmitter();
+      var Server = sinon.stub().returns({
+        on: sinon.stub()
+      });
+      var TestWebService = proxyquire('../../lib/services/web', {
+        http: {
+          createServer: sinon.stub().returns('server')
+        },
+        fs: fsStub,
+        'socket.io': {
+          Server: Server
+        }
+      });
+      var web = new TestWebService({node: node});
+      web.start(function(err) {
+        if (err) {
+          return done(err);
+        }
+        Server.callCount.should.equal(1);
+        Server.calledWithNew().should.equal(true);
+        Server.args[0][0].should.equal('server');
+        var options = Server.args[0][1];
+        options.allowEIO3.should.equal(true);
+        options.cors.should.deep.equal({origin: true, credentials: true});
+        should.not.exist(options.transports);
+        done();
+      });
+    });
+    it('should limit socket.io to websocket when polling is disabled', function(done) {
+      var node = new EventEmitter();
+      var Server = sinon.stub().returns({
+        on: sinon.stub()
+      });
+      var TestWebService = proxyquire('../../lib/services/web', {
+        http: {
+          createServer: sinon.stub().returns('server')
+        },
+        fs: fsStub,
+        'socket.io': {
+          Server: Server
+        }
+      });
+      var web = new TestWebService({node: node, disablePolling: true});
+      web.start(function(err) {
+        if (err) {
+          return done(err);
+        }
+        Server.args[0][1].transports.should.deep.equal(['websocket']);
+        Server.args[0][1].allowEIO3.should.equal(true);
         done();
       });
     });
@@ -277,7 +331,7 @@ describe('WebService', function() {
   });
 
   describe('#socketHandler', function() {
-    var sandbox = sinon.sandbox.create();
+    var sandbox = sinon.createSandbox();
     beforeEach(function() {
       sandbox.stub(log, 'info');
     });
@@ -301,6 +355,7 @@ describe('WebService', function() {
     var module1 = new Module1();
     var node = {
       on: sinon.spy(),
+      allowedOriginRegexp: new RegExp('.*'),
       openBus: sinon.stub().returns(bus),
       getAllPublishEvents: sinon.stub().returns(module1.getPublishEvents())
     };

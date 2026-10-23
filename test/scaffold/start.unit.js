@@ -9,7 +9,7 @@ var start = require('../../lib/scaffold/start');
 
 describe('#start', function() {
   describe('#checkConfigVersion2', function() {
-    var sandbox = sinon.sandbox.create();
+    var sandbox = sinon.createSandbox();
     beforeEach(function() {
       sandbox.stub(console, 'warn');
     });
@@ -237,11 +237,11 @@ describe('#start', function() {
       var logStub;
 
       before(function() {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         var start = require('../../lib/scaffold/start');
         var log = require('../../lib').log;
         logStub = sandbox.stub(log, 'error');
-        cleanShutdown = sandbox.stub(start, 'cleanShutdown', function() {});
+        cleanShutdown = sandbox.stub(start, 'cleanShutdown').callsFake(function() {});
         exitHandler = require('../../lib/scaffold/start').exitHandler;
       });
 

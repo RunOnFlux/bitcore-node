@@ -6,7 +6,7 @@ var should = chai.should();
 var Logger = require('../lib/logger');
 
 describe('Logger', function() {
-  var sandbox = sinon.sandbox.create();
+  var sandbox = sinon.createSandbox();
   afterEach(function() {
     sandbox.restore();
   });

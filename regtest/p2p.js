@@ -14,7 +14,7 @@ var bitcore = require('bitcore-lib');
 var Transaction = bitcore.Transaction;
 var BN = bitcore.crypto.BN;
 var async = require('async');
-var rimraf = require('rimraf');
+var fs = require('fs');
 var bitcoind;
 
 /* jshint unused: false */
@@ -44,7 +44,7 @@ describe('P2P Functionality', function() {
     var regtestNetwork = bitcore.Networks.get('regtest');
     var datadir = __dirname + '/data';
 
-    rimraf(datadir + '/regtest', function(err) {
+    fs.rm(datadir + '/regtest', {recursive: true, force: true}, function(err) {
       if (err) {
         throw err;
       }

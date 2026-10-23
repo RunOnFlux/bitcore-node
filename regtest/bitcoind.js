@@ -10,7 +10,7 @@ var chai = require('chai');
 var bitcore = require('bitcore-lib');
 var BN = bitcore.crypto.BN;
 var async = require('async');
-var rimraf = require('rimraf');
+var fs = require('fs');
 var bitcoind;
 
 /* jshint unused: false */
@@ -37,7 +37,7 @@ describe('Fluxd Functionality', function() {
 
     var datadir = __dirname + '/data';
 
-    rimraf(datadir + '/regtest', function(err) {
+    fs.rm(datadir + '/regtest', {recursive: true, force: true}, function(err) {
 
       if (err) {
         throw err;
@@ -359,7 +359,7 @@ describe('Fluxd Functionality', function() {
     });
 
     it('will throw an error for unexpected types (tx decode failed)', function(done) {
-      var garbage = new Buffer('abcdef', 'hex');
+      var garbage = Buffer.from('abcdef', 'hex');
       bitcoind.sendTransaction(garbage, function(err, hash) {
         should.exist(err);
         should.not.exist(hash);

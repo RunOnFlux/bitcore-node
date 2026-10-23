@@ -10,7 +10,7 @@ log.debug = function() {};
 
 var chai = require('chai');
 var bitcore = require('bitcore-lib');
-var rimraf = require('rimraf');
+var fs = require('fs');
 var node;
 
 var should = chai.should();
@@ -38,7 +38,7 @@ describe('Node Functionality', function() {
 
     testKey = bitcore.PrivateKey(testWIF);
 
-    rimraf(datadir + '/regtest', function(err) {
+    fs.rm(datadir + '/regtest', {recursive: true, force: true}, function(err) {
 
       if (err) {
         throw err;
