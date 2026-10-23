@@ -50,7 +50,7 @@ describe('#create', function() {
     });
   });
 
-  it('will create scaffold files', function() {
+  it('will create scaffold files', function(done) {
     create({
       cwd: testDir,
       dirname: 'mynode',
@@ -59,7 +59,7 @@ describe('#create', function() {
       datadir: './data'
     }, function(err) {
       if (err) {
-        throw err;
+        return done(err);
       }
 
       var configPath = testDir + '/mynode/bitcore-node.json';
@@ -69,18 +69,19 @@ describe('#create', function() {
       should.equal(fs.existsSync(packagePath), true);
 
       var config = JSON.parse(fs.readFileSync(configPath));
-      config.services.should.deep.equal(['bitcoind', 'db', 'address', 'web']);
-      config.datadir.should.equal('./data');
+      config.services.should.deep.equal(['bitcoind', 'web']);
+      config.servicesConfig.bitcoind.spawn.datadir.should.equal('./data');
       config.network.should.equal('livenet');
 
       var pack = JSON.parse(fs.readFileSync(packagePath));
       should.exist(pack.dependencies);
 
+      done();
     });
 
   });
 
-  it('will error if directory already exists', function() {
+  it('will error if directory already exists', function(done) {
 
     create({
       cwd: testDir,
@@ -91,11 +92,12 @@ describe('#create', function() {
     }, function(err) {
       should.exist(err);
       err.message.should.match(/^Directory/);
+      done();
     });
 
   });
 
-  it('will not create a package.json if globally installed', function() {
+  it('will not create a package.json if globally installed', function(done) {
 
     create({
       cwd: testDir,
@@ -105,17 +107,18 @@ describe('#create', function() {
       datadir: '../.flux'
     }, function(err) {
       if (err) {
-        throw err;
+        return done(err);
       }
 
       var packagePath = testDir + '/mynode3/package.json';
       should.equal(fs.existsSync(packagePath), false);
 
+      done();
     });
 
   });
 
-  it('will receieve an error from npm', function() {
+  it('will receieve an error from npm', function(done) {
     var createtest = proxyquire('../../lib/scaffold/create', {
       'child_process': {
         spawn: sinon.stub().returns({
@@ -141,6 +144,7 @@ describe('#create', function() {
     }, function(err) {
       should.exist(err);
       err.message.should.equal('There was an error installing dependencies.');
+      done();
     });
 
   });
