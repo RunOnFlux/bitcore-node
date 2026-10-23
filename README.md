@@ -20,8 +20,7 @@ bitcore-node start
 ## Prerequisites
 
 - GNU/Linux x86_32/x86_64, or OSX 64bit *(for fluxd distributed binaries)*
-- Node.js v0.10, v0.12 or v4
-- ZeroMQ *(libzmq3-dev for Ubuntu/Debian or zeromq on OSX)*
+- Node.js 24 LTS or newer
 - ~30GB of disk storage
 - ~2GB of RAM
 
