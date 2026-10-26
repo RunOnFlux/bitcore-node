@@ -112,6 +112,30 @@ describe('#start', function() {
       services[0].name.should.equal('local');
       services[0].module.should.equal(LocalService);
     });
+    it('will name a scoped package\'s service without its scope', function() {
+      function ScopedService() {}
+      ScopedService.dependencies = [];
+      ScopedService.prototype.start = sinon.stub();
+      ScopedService.prototype.stop = sinon.stub();
+      var notfoundPath = path.resolve(__dirname, '../../lib/services/insight-api');
+      var testRequire = function(p) {
+        if (p === notfoundPath) {
+          throw new Error();
+        } else if (p === '@runonflux/insight-api/package.json') {
+          return {name: '@runonflux/insight-api'};
+        } else if (p === '@runonflux/insight-api') {
+          return ScopedService;
+        }
+      };
+      var config = {
+        services: ['@runonflux/insight-api'],
+        servicesConfig: {'insight-api': {routePrefix: 'api'}}
+      };
+      var services = setupServices(testRequire, cwd, config);
+      services[0].name.should.equal('insight-api');
+      services[0].config.should.deep.equal({routePrefix: 'api'});
+      services[0].module.should.equal(ScopedService);
+    });
     it('will throw error if module is incompatible', function() {
       var internal = {};
       var testRequire = function() {

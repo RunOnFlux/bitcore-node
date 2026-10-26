@@ -36,7 +36,7 @@ cat << EOF > bitcore-node.json
   "services": [
     "bitcoind",
     "@runonflux/insight-api",
-    "insight-ui",
+    "@runonflux/insight-ui",
     "web"
   ],
   "messageLog": "",
@@ -56,7 +56,7 @@ cat << EOF > bitcore-node.json
         "zmqpubhashblock": "tcp://127.0.0.1:28332"
       }
     },
-    "@runonflux/insight-api": {
+    "insight-api": {
         "routePrefix": "api",
                  "db": {
                    "host": "127.0.0.1",
@@ -108,12 +108,8 @@ addnode=blockbook.runonflux.io
 EOF
 
 cd ..
-npm install @runonflux/insight-api
-cd node_modules
-git clone https://github.com/runonflux/insight-ui
-cd insight-ui
-npm install
-cd ../..
+npm install @runonflux/insight-api @runonflux/insight-ui
+cd ..
 
 echo "Explorer is installed"
 echo "Then to start explorer navigate to mynode folder and type npx bitcore-node start. Explorer will be accessible on localhost:3001" 

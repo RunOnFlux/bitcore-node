@@ -27,6 +27,19 @@ Services correspond with a Node.js module as described in 'package.json', for ex
 }
 ```
 
+`services` names each service's package. A scoped package provides the service named without its
+scope: `@runonflux/insight-api` is the service `insight-api`, which is the name its settings go
+under in `servicesConfig` and the name other services list in their `dependencies`.
+
+```json
+{
+  "services": ["bitcoind", "@runonflux/insight-api", "web"],
+  "servicesConfig": {
+    "insight-api": {"routePrefix": "api"}
+  }
+}
+```
+
 _Note:_ If you already have a bitcore-node database, and you want to query data from previous blocks in the blockchain, you will need to reindex. Reindexing right now means deleting your bitcore-node database and resyncing.
 
 ## Using Services Programmatically
