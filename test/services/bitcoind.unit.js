@@ -127,18 +127,27 @@ describe('Bitcoin Service', function() {
         ['getAddressBalance', 2],
         ['getAddressUnspentOutputs', 2],
         ['getAddressHistory', 2],
-        ['getAddressSummary', 1],
+        ['getAddressSummary', 2],
         ['generateBlock', 1],
         ['listUnspent', 3],
         ['getAddressesMempoolBalance', 2],
         ['getJsonRawTransaction', 1],
         ['getJsonBlock', 1],
         ['getMiningInfo', 0],
-        ['getNetworkHash', 0]
+        ['getNetworkHash', 1]
       ]);
       methods.forEach(function(method) {
         method[1].should.equal(bitcoind);
         method[2].should.equal(bitcoind[method[0]]);
+      });
+    });
+    it('will pass the callback as each method\'s callback parameter', function() {
+      // these two take an optional options object and accept the callback in its place
+      var optionalOptions = ['getBlockHashesByTimestamp', 'sendTransaction'];
+      var bitcoind = new BitcoinService(baseConfig);
+      bitcoind.getAPIMethods().forEach(function(method) {
+        var parameters = method[3] + (optionalOptions.indexOf(method[0]) === -1 ? 1 : 2);
+        method[2].length.should.equal(parameters, method[0]);
       });
     });
   });
