@@ -8,28 +8,23 @@ sudo apt-get install -y nodejs
 sudo apt-get install -y build-essential
 
 # MongoDB
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
-echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.1 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.1.list
+curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-8.0.gpg
+echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
 sudo systemctl enable mongod
 sudo service mongod start
 
 # Flux
-echo 'deb https://apt.runonflux.io/ '$(lsb_release -cs)' main' | sudo tee --append /etc/apt/sources.list.d/flux.list
 gpg --keyserver keyserver.ubuntu.com --recv 4B69CA27A986265D
-gpg --export 4B69CA27A986265D | sudo apt-key add -
+gpg --export 4B69CA27A986265D | sudo tee /usr/share/keyrings/flux.gpg > /dev/null
+echo "deb [ signed-by=/usr/share/keyrings/flux.gpg ] https://apt.runonflux.io/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/flux.list
 sudo apt-get update
 sudo apt-get install flux
 
 #bitcore-node
 cd
-git clone https://github.com/runonflux/bitcore-node
-cd bitcore-node
-npm install
-cd bin
-chmod +x bitcore-node
-./bitcore-node create mynode
+npx -y -p @runonflux/bitcore-node bitcore-node create mynode
 cd mynode
 
 rm bitcore-node.json
@@ -40,7 +35,7 @@ cat << EOF > bitcore-node.json
   "port": 3001,
   "services": [
     "bitcoind",
-    "insight-api",
+    "@runonflux/insight-api",
     "insight-ui",
     "web"
   ],
@@ -61,7 +56,7 @@ cat << EOF > bitcore-node.json
         "zmqpubhashblock": "tcp://127.0.0.1:28332"
       }
     },
-    "insight-api": {
+    "@runonflux/insight-api": {
         "routePrefix": "api",
                  "db": {
                    "host": "127.0.0.1",
@@ -113,16 +108,12 @@ addnode=blockbook.runonflux.io
 EOF
 
 cd ..
+npm install @runonflux/insight-api
 cd node_modules
-git clone https://github.com/runonflux/insight-api
 git clone https://github.com/runonflux/insight-ui
-cd insight-api
-npm install
-cd ..
 cd insight-ui
 npm install
-cd ..
-cd ..
+cd ../..
 
 echo "Explorer is installed"
-echo "Then to start explorer navigate to mynode folder and type ../bitcore-node start. Explorer will be accessible on localhost:3001" 
+echo "Then to start explorer navigate to mynode folder and type npx bitcore-node start. Explorer will be accessible on localhost:3001" 

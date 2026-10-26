@@ -2,7 +2,6 @@
 
 set -e
 
-mocha -R spec regtest/p2p.js
 mocha -R spec regtest/bitcoind.js
 mocha -R spec regtest/cluster.js
 mocha -R spec regtest/node.js

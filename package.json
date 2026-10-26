@@ -1,8 +1,13 @@
 {
-  "name": "bitcore-node",
+  "name": "@runonflux/bitcore-node",
   "description": "Full node with extended capabilities using Bitcore and Flux",
-  "version": "3.3.0",
+  "version": "4.0.0",
   "main": "./index.js",
+  "files": [
+    "index.js",
+    "bin",
+    "lib"
+  ],
   "repository": "https://github.com/runonflux/bitcore-node.git",
   "homepage": "https://runonflux.io",
   "bugs": {
@@ -61,9 +66,9 @@
     "fluxd"
   ],
   "dependencies": {
+    "@runonflux/bitcoind-rpc": "^0.8.0",
+    "@runonflux/bitcore-lib": "^0.16.0",
     "async": "^3.2.6",
-    "bitcoind-rpc": "git+https://github.com/runonflux/bitcoind-rpc.git#07bcc945ef12bf6d5e03519dd053557e3baabb0d",
-    "bitcore-lib": "git+https://github.com/runonflux/bitcore-lib.git#8f5453fdcee462e30532f9f93884ebe6aff71ef9",
     "body-parser": "^2.4.0",
     "colors": "1.4.0",
     "commander": "^15.0.0",
@@ -82,7 +87,6 @@
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "bitcore-p2p": "^10.10.7",
     "c8": "^12.0.0",
     "chai": "^6.3.0",
     "mocha": "^12.0.3",
@@ -94,5 +98,8 @@
     "zeromq@6.8.0": true,
     "bufferutil@4.1.0": true,
     "utf-8-validate@6.0.6": true
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

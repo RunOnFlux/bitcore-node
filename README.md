@@ -11,9 +11,7 @@ wget -qO- https://raw.githubusercontent.com/runonflux/bitcore-node/master/instal
 ## Install
 
 ```bash
-git clone https://github.com/runonflux/bitcore-node.git
-cd bitcore-node
-npm install
+npm install -g @runonflux/bitcore-node
 bitcore-node start
 ```
 

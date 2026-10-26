@@ -20,9 +20,9 @@ Services correspond with a Node.js module as described in 'package.json', for ex
 ```json
 {
   "dependencies": {
-    "bitcore-lib": "^0.13.7",
-    "bitcore-node": "^0.2.0",
-    "insight-api": "^3.0.0"
+    "@runonflux/bitcore-lib": "^0.16.0",
+    "@runonflux/bitcore-node": "^4.0.0",
+    "@runonflux/insight-api": "^2.0.0"
   }
 }
 ```
@@ -34,7 +34,7 @@ If, instead, you would like to run a custom node, you can include services by in
 
 ```js
 //Require bitcore
-var bitcore = require('bitcore-node');
+var bitcore = require('@runonflux/bitcore-node');
 
 //Services
 var Bitcoin = bitcore.services.Bitcoin;

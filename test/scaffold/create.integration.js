@@ -74,7 +74,8 @@ describe('#create', function() {
       config.network.should.equal('livenet');
 
       var pack = JSON.parse(fs.readFileSync(packagePath));
-      should.exist(pack.dependencies);
+      pack.dependencies.should.have.all.keys('@runonflux/bitcore-lib', '@runonflux/bitcore-node');
+      pack.allowScripts.should.deep.equal({zeromq: true, bufferutil: true, 'utf-8-validate': true});
 
       done();
     });
