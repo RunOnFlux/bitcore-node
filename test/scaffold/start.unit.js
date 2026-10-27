@@ -222,18 +222,26 @@ describe('#start', function() {
         done();
       });
     });
-    it('stop and exit on `SIGINT`', function(done) {
-      var proc = new EventEmitter();
-      proc.exit = sinon.stub();
-      var node = {
-        stop: sinon.stub().callsArg(0)
-      };
-      registerExitHandlers(proc, node);
-      proc.emit('SIGINT');
-      setImmediate(function() {
-        node.stop.callCount.should.equal(1);
-        proc.exit.callCount.should.equal(1);
-        done();
+    // Node calls a signal listener with the signal's name
+    ['SIGINT', 'SIGTERM'].forEach(function(signal) {
+      it('stop once and exit 0 on `' + signal + '`', function(done) {
+        var signalLog = {info: sinon.stub(), error: sinon.stub()};
+        var register = proxyquire('../../lib/scaffold/start', {'../': {log: signalLog}})
+          .registerExitHandlers;
+        var proc = new EventEmitter();
+        proc.exit = sinon.stub();
+        var node = {
+          stop: sinon.stub().callsArg(0)
+        };
+        register(proc, node);
+        proc.emit(signal, signal);
+        setImmediate(function() {
+          node.stop.callCount.should.equal(1);
+          proc.exit.callCount.should.equal(1);
+          proc.exit.args[0][0].should.equal(0);
+          signalLog.error.callCount.should.equal(0);
+          done();
+        });
       });
     });
   });
@@ -249,9 +257,9 @@ describe('#start', function() {
       stub.restore();
     });
 
-    it('should setup two listeners on process when registering exit handlers', function() {
+    it('should setup three listeners on process when registering exit handlers', function() {
       registerExitHandlers(process, {});
-      stub.callCount.should.equal(2);
+      stub.callCount.should.equal(3);
     });
 
     describe('#exitHandler', function() {
