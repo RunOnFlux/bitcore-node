@@ -8,10 +8,10 @@
     "bin",
     "lib"
   ],
-  "repository": "https://github.com/runonflux/bitcore-node.git",
+  "repository": "https://github.com/RunOnFlux/bitcore-node.git",
   "homepage": "https://runonflux.io",
   "bugs": {
-    "url": "https://github.com/runonflux/bitcore-node/issues"
+    "url": "https://github.com/RunOnFlux/bitcore-node/issues"
   },
   "contributors": [
     {
