@@ -66,6 +66,50 @@ describe('Bitcoin Service', function() {
       should.exist(bitcoind.lastTip);
       should.exist(bitcoind.lastTipTimeout);
     });
+    it('will bound every block and transaction cache by memory', function() {
+      var bitcoind = new BitcoinService(baseConfig);
+      var budget = BitcoinService.DEFAULT_CACHE_SIZE_MB * 1024 * 1024;
+      var total = 0;
+      ['utxosCache', 'txidsCache', 'balanceCache', 'summaryCache', 'blockOverviewCache',
+        'transactionDetailedCache', 'transactionCache', 'rawTransactionCache', 'rawJsonTransactionCache',
+        'blockCache', 'blockJsonCache', 'rawBlockCache', 'blockHeaderCache'].forEach(function(name) {
+        bitcoind[name].maxSize.should.be.above(0);
+        total += bitcoind[name].maxSize;
+      });
+      total.should.be.at.most(budget);
+    });
+    it('will keep a cache within its share when filled with large address lists', function() {
+      var bitcoind = new BitcoinService(baseConfig);
+      var utxos = [];
+      for (var i = 0; i < 20000; i++) {
+        utxos.push({txid: 'aa'.repeat(32), outputIndex: i, satoshis: 1});
+      }
+      for (var k = 0; k < 200; k++) {
+        bitcoind.utxosCache.set('address' + k, utxos);
+      }
+      bitcoind.utxosCache.calculatedSize.should.be.at.most(bitcoind.utxosCache.maxSize);
+      bitcoind.utxosCache.size.should.be.below(200);
+      should.exist(bitcoind.utxosCache.get('address199'));
+    });
+    it('will not cache a value larger than the largest entry', function() {
+      var bitcoind = new BitcoinService(baseConfig);
+      var txids = new Array(200000).fill('bb'.repeat(32));
+      BitcoinService.cachedSize(txids).should.be.above(BitcoinService.MAX_CACHE_ENTRY_BYTES);
+      bitcoind.txidsCache.set('busy', txids);
+      should.not.exist(bitcoind.txidsCache.get('busy'));
+    });
+    it('will share out cacheSizeMB', function() {
+      var bitcoind = new BitcoinService(Object.assign({}, baseConfig, {cacheSizeMB: 64}));
+      bitcoind.utxosCache.maxSize.should.equal(Math.floor(64 * 1024 * 1024 * 0.15));
+    });
+    it('will size cached values by their buffers and lists', function() {
+      BitcoinService.cachedSize(Buffer.alloc(1000)).should.equal(1064);
+      BitcoinService.cachedSize(['a', 'b']).should.equal(64 + 2 * 128);
+      BitcoinService.cachedSize([{}, {}]).should.equal(64 + 2 * 512);
+      BitcoinService.cachedSize({inputs: [{}], outputs: [{}, {}]}).should.equal(512 + 3 * 512);
+      BitcoinService.cachedSize({}).should.equal(512);
+      BitcoinService.cachedSize(5).should.equal(64);
+    });
     it('will init clients', function() {
       var bitcoind = new BitcoinService(baseConfig);
       bitcoind.nodes.should.deep.equal([]);
