@@ -4,6 +4,7 @@ var should = require('chai').should();
 var sinon = require('sinon');
 var EventEmitter = require('events').EventEmitter;
 var proxyquire = require('proxyquire');
+var http = require('http');
 
 var index = require('../../lib');
 var log = index.log;
@@ -54,8 +55,8 @@ describe('WebService', function() {
 
   describe('#start', function() {
     beforeEach(function() {
-      httpStub.createServer.reset();
-      httpsStub.createServer.reset();
+      httpStub.createServer.resetHistory();
+      httpsStub.createServer.resetHistory();
     });
     it('should create an http server if no options are specified and node is not configured for https', function(done) {
       var web = new WebService({node: defaultNode});
@@ -91,13 +92,14 @@ describe('WebService', function() {
         },
         fs: fsStub,
         express: sinon.stub().returns({
-          use: sinon.stub()
+          use: sinon.stub(),
+          set: sinon.stub()
         }),
         'body-parser': {
           json: jsonStub
         },
         'socket.io': {
-          listen: sinon.stub().returns({
+          Server: sinon.stub().returns({
             on: sinon.stub()
           })
         }
@@ -108,8 +110,123 @@ describe('WebService', function() {
           return done(err);
         }
         jsonStub.callCount.should.equal(1);
-        jsonStub.args[0][0].limit.should.equal('100kb');
+        jsonStub.args[0][0].limit.should.equal('2000kb');
         done();
+      });
+    });
+    it('should accept Engine.IO v3 clients from every origin', function(done) {
+      var node = new EventEmitter();
+      var Server = sinon.stub().returns({
+        on: sinon.stub()
+      });
+      var TestWebService = proxyquire('../../lib/services/web', {
+        http: {
+          createServer: sinon.stub().returns('server')
+        },
+        fs: fsStub,
+        'socket.io': {
+          Server: Server
+        }
+      });
+      var web = new TestWebService({node: node});
+      web.start(function(err) {
+        if (err) {
+          return done(err);
+        }
+        Server.callCount.should.equal(1);
+        Server.calledWithNew().should.equal(true);
+        Server.args[0][0].should.equal('server');
+        var options = Server.args[0][1];
+        options.allowEIO3.should.equal(true);
+        options.cors.should.equal(TestWebService.socketCors);
+        options.cookie.should.deep.equal({name: 'io', path: '/', httpOnly: true, sameSite: 'strict'});
+        should.not.exist(options.transports);
+        done();
+      });
+    });
+    it('should limit socket.io to websocket when polling is disabled', function(done) {
+      var node = new EventEmitter();
+      var Server = sinon.stub().returns({
+        on: sinon.stub()
+      });
+      var TestWebService = proxyquire('../../lib/services/web', {
+        http: {
+          createServer: sinon.stub().returns('server')
+        },
+        fs: fsStub,
+        'socket.io': {
+          Server: Server
+        }
+      });
+      var web = new TestWebService({node: node, disablePolling: true});
+      web.start(function(err) {
+        if (err) {
+          return done(err);
+        }
+        Server.args[0][1].transports.should.deep.equal(['websocket']);
+        Server.args[0][1].allowEIO3.should.equal(true);
+        done();
+      });
+    });
+  });
+
+  describe('socket.io handshake', function() {
+    var RealWebService = require('../../lib/services/web');
+    var web;
+    beforeEach(function(done) {
+      // an EIO3 handshake also connects the default namespace
+      var node = new EventEmitter();
+      node.allowedOriginRegexp = /.*/;
+      node.openBus = function() {
+        return {on: sinon.stub(), close: sinon.stub()};
+      };
+      web = new RealWebService({node: node});
+      web.eventNames = [];
+      web.start(function() {
+        web.server.listen(0, '127.0.0.1', done);
+      });
+    });
+    afterEach(function(done) {
+      web.io.close();
+      done();
+    });
+    function handshake(eio, headers, callback) {
+      var port = web.server.address().port;
+      http.get({
+        host: '127.0.0.1',
+        port: port,
+        path: '/socket.io/?EIO=' + eio + '&transport=polling',
+        headers: headers
+      }, function(res) {
+        res.resume();
+        res.on('end', function() {
+          callback(res);
+        });
+      });
+    }
+    [3, 4].forEach(function(eio) {
+      it('EIO' + eio + ': answers a request without an Origin with "*" and no credentials', function(done) {
+        handshake(eio, {}, function(res) {
+          res.statusCode.should.equal(200);
+          res.headers['access-control-allow-origin'].should.equal('*');
+          should.not.exist(res.headers['access-control-allow-credentials']);
+          done();
+        });
+      });
+      it('EIO' + eio + ': answers a request with an Origin with that origin and credentials', function(done) {
+        handshake(eio, {Origin: 'https://explorer.runonflux.io'}, function(res) {
+          res.statusCode.should.equal(200);
+          res.headers['access-control-allow-origin'].should.equal('https://explorer.runonflux.io');
+          res.headers['access-control-allow-credentials'].should.equal('true');
+          done();
+        });
+      });
+      it('EIO' + eio + ': sets the io cookie strict', function(done) {
+        handshake(eio, {}, function(res) {
+          res.headers['set-cookie'].length.should.equal(1);
+          res.headers['set-cookie'][0].should.match(/^io=[^;]+; Path=\/; HttpOnly; SameSite=Strict$/);
+          done();
+        });
       });
     });
   });
@@ -277,7 +394,7 @@ describe('WebService', function() {
   });
 
   describe('#socketHandler', function() {
-    var sandbox = sinon.sandbox.create();
+    var sandbox = sinon.createSandbox();
     beforeEach(function() {
       sandbox.stub(log, 'info');
     });
@@ -301,6 +418,7 @@ describe('WebService', function() {
     var module1 = new Module1();
     var node = {
       on: sinon.spy(),
+      allowedOriginRegexp: new RegExp('.*'),
       openBus: sinon.stub().returns(bus),
       getAllPublishEvents: sinon.stub().returns(module1.getPublishEvents())
     };

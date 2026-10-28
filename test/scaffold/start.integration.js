@@ -9,7 +9,7 @@ var log = index.log;
 
 describe('#start', function() {
 
-  var sandbox = sinon.sandbox.create();
+  var sandbox = sinon.createSandbox();
   beforeEach(function() {
     sandbox.stub(log, 'error');
   });

@@ -5,7 +5,7 @@
 Install Node.js by your favorite method, or use Node Version Manager by following directions at https://github.com/creationix/nvm
 
 ```bash
-nvm install v4
+nvm install 24
 ```
 
 ## Fork and Download Repositories
@@ -32,15 +32,7 @@ git checkout <branchname>
 
 For Ubuntu:
 ```bash
-sudo apt-get install libzmq3-dev
 sudo apt-get install build-essential
-```
-**Note**: Make sure that libzmq-dev is not installed, it should be removed when installing libzmq3-dev.
-
-
-For Mac OS X:
-```bash
-brew install zeromq
 ```
 
 ## Install and Symlink

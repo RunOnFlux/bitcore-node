@@ -23,7 +23,7 @@ describe('Utils', function() {
     });
 
     it('false for invalid type (buffer)', function() {
-      var a = utils.isHash(new Buffer('abcdef', 'hex'));
+      var a = utils.isHash(Buffer.from('abcdef', 'hex'));
       a.should.equal(false);
     });
 

@@ -1,12 +1,17 @@
 {
-  "name": "bitcore-node",
+  "name": "@runonflux/bitcore-node",
   "description": "Full node with extended capabilities using Bitcore and Flux",
-  "version": "3.3.0",
+  "version": "4.0.0",
   "main": "./index.js",
-  "repository": "https://github.com/runonflux/bitcore-node.git",
+  "files": [
+    "index.js",
+    "bin",
+    "lib"
+  ],
+  "repository": "https://github.com/RunOnFlux/bitcore-node.git",
   "homepage": "https://runonflux.io",
   "bugs": {
-    "url": "https://github.com/runonflux/bitcore-node/issues"
+    "url": "https://github.com/RunOnFlux/bitcore-node/issues"
   },
   "contributors": [
     {
@@ -48,52 +53,53 @@
   "bin": {
     "bitcore-node": "./bin/bitcore-node"
   },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "test": "mocha -R spec --recursive",
     "regtest": "./scripts/regtest",
-    "jshint": "jshint --reporter=node_modules/jshint-stylish ./lib",
-    "coverage": "istanbul cover _mocha -- --recursive",
-    "coveralls": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- --recursive -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "coverage": "c8 mocha -R spec --recursive"
   },
   "tags": [
     "flux",
     "fluxd"
   ],
   "dependencies": {
-    "async": "^2.5.0",
-    "bitcoind-rpc": "https://github.com/runonflux/bitcoind-rpc#master",
-    "bitcore-lib": "https://github.com/runonflux/bitcore-lib#master",
-    "body-parser": "^1.18.3",
-    "colors": "^1.1.2",
-    "commander": "^2.8.1",
-    "errno": "^0.1.4",
-    "express": "^4.16.3",
-    "liftoff": "^2.2.0",
-    "lru-cache": "^4.0.1",
-    "mkdirp": "0.5.1",
-    "npm": "^2.14.1",
-    "path-is-absolute": "^1.0.0",
-    "semver": "^5.0.1",
-    "socket.io": "^2.1.1",
-    "socket.io-client": "^2.1.1",
-    "zeromq": "^4.6.0"
+    "@runonflux/bitcoind-rpc": "^0.8.0",
+    "@runonflux/bitcore-lib": "^0.16.0",
+    "async": "^3.2.6",
+    "body-parser": "^2.4.0",
+    "colors": "1.4.0",
+    "commander": "^15.0.0",
+    "errno": "^1.0.0",
+    "express": "^5.3.0",
+    "liftoff": "^5.0.1",
+    "lru-cache": "^11.5.3",
+    "semver": "^7.8.5",
+    "socket.io": "^4.8.4",
+    "socket.io-client": "^4.8.4",
+    "zeromq": "^6.8.0"
   },
   "optionalDependencies": {
-    "bufferutil": "~1.2.1",
-    "utf-8-validate": "~4.0.1"
+    "bufferutil": "^4.1.0",
+    "utf-8-validate": "^6.0.6"
   },
   "devDependencies": {
-    "benchmark": "1.0.0",
-    "bitcore-p2p": "^1.1.0",
-    "chai": "^3.5.0",
-    "coveralls": "^2.11.9",
-    "istanbul": "^0.4.3",
-    "jshint": "^2.9.2",
-    "jshint-stylish": "^2.1.0",
-    "mocha": "^5.0.5",
-    "proxyquire": "^1.3.1",
-    "rimraf": "^2.4.2",
-    "sinon": "^4.4.8"
+    "benchmark": "^2.1.4",
+    "c8": "^12.0.0",
+    "chai": "^6.3.0",
+    "mocha": "^12.0.3",
+    "proxyquire": "^2.1.3",
+    "sinon": "^22.1.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "allowScripts": {
+    "zeromq@6.8.0": true,
+    "bufferutil@4.1.0": true,
+    "utf-8-validate@6.0.6": true
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

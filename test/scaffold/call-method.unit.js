@@ -10,7 +10,7 @@ describe('#callMethod', function() {
   var expectedUrl = 'http://localhost:3001';
   var expectedOptions = {
     reconnection: false,
-    connect_timeout: 5000
+    timeout: 5000
   };
 
   var callOptions = {

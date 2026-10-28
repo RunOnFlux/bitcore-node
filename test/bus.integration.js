@@ -44,7 +44,7 @@ TestService.prototype.unsubscribe = function(name, emitter) {
 
 
 describe('Bus Functionality', function() {
-  var sandbox = sinon.sandbox.create();
+  var sandbox = sinon.createSandbox();
   beforeEach(function() {
     sandbox.stub(log, 'info');
   });

@@ -9,7 +9,7 @@ var start = require('../../lib/scaffold/start');
 
 describe('#start', function() {
   describe('#checkConfigVersion2', function() {
-    var sandbox = sinon.sandbox.create();
+    var sandbox = sinon.createSandbox();
     beforeEach(function() {
       sandbox.stub(console, 'warn');
     });
@@ -112,6 +112,30 @@ describe('#start', function() {
       services[0].name.should.equal('local');
       services[0].module.should.equal(LocalService);
     });
+    it('will name a scoped package\'s service without its scope', function() {
+      function ScopedService() {}
+      ScopedService.dependencies = [];
+      ScopedService.prototype.start = sinon.stub();
+      ScopedService.prototype.stop = sinon.stub();
+      var notfoundPath = path.resolve(__dirname, '../../lib/services/insight-api');
+      var testRequire = function(p) {
+        if (p === notfoundPath) {
+          throw new Error();
+        } else if (p === '@runonflux/insight-api/package.json') {
+          return {name: '@runonflux/insight-api'};
+        } else if (p === '@runonflux/insight-api') {
+          return ScopedService;
+        }
+      };
+      var config = {
+        services: ['@runonflux/insight-api'],
+        servicesConfig: {'insight-api': {routePrefix: 'api'}}
+      };
+      var services = setupServices(testRequire, cwd, config);
+      services[0].name.should.equal('insight-api');
+      services[0].config.should.deep.equal({routePrefix: 'api'});
+      services[0].module.should.equal(ScopedService);
+    });
     it('will throw error if module is incompatible', function() {
       var internal = {};
       var testRequire = function() {
@@ -198,18 +222,26 @@ describe('#start', function() {
         done();
       });
     });
-    it('stop and exit on `SIGINT`', function(done) {
-      var proc = new EventEmitter();
-      proc.exit = sinon.stub();
-      var node = {
-        stop: sinon.stub().callsArg(0)
-      };
-      registerExitHandlers(proc, node);
-      proc.emit('SIGINT');
-      setImmediate(function() {
-        node.stop.callCount.should.equal(1);
-        proc.exit.callCount.should.equal(1);
-        done();
+    // Node calls a signal listener with the signal's name
+    ['SIGINT', 'SIGTERM'].forEach(function(signal) {
+      it('stop once and exit 0 on `' + signal + '`', function(done) {
+        var signalLog = {info: sinon.stub(), error: sinon.stub()};
+        var register = proxyquire('../../lib/scaffold/start', {'../': {log: signalLog}})
+          .registerExitHandlers;
+        var proc = new EventEmitter();
+        proc.exit = sinon.stub();
+        var node = {
+          stop: sinon.stub().callsArg(0)
+        };
+        register(proc, node);
+        proc.emit(signal, signal);
+        setImmediate(function() {
+          node.stop.callCount.should.equal(1);
+          proc.exit.callCount.should.equal(1);
+          proc.exit.args[0][0].should.equal(0);
+          signalLog.error.callCount.should.equal(0);
+          done();
+        });
       });
     });
   });
@@ -225,9 +257,9 @@ describe('#start', function() {
       stub.restore();
     });
 
-    it('should setup two listeners on process when registering exit handlers', function() {
+    it('should setup three listeners on process when registering exit handlers', function() {
       registerExitHandlers(process, {});
-      stub.callCount.should.equal(2);
+      stub.callCount.should.equal(3);
     });
 
     describe('#exitHandler', function() {
@@ -237,11 +269,11 @@ describe('#start', function() {
       var logStub;
 
       before(function() {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         var start = require('../../lib/scaffold/start');
         var log = require('../../lib').log;
         logStub = sandbox.stub(log, 'error');
-        cleanShutdown = sandbox.stub(start, 'cleanShutdown', function() {});
+        cleanShutdown = sandbox.stub(start, 'cleanShutdown').callsFake(function() {});
         exitHandler = require('../../lib/scaffold/start').exitHandler;
       });
 

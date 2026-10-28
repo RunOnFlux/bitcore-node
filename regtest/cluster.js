@@ -4,9 +4,9 @@ var path = require('path');
 var async = require('async');
 var spawn = require('child_process').spawn;
 
-var BitcoinRPC = require('bitcoind-rpc');
-var rimraf = require('rimraf');
-var bitcore = require('bitcore-lib');
+var BitcoinRPC = require('@runonflux/bitcoind-rpc');
+var fs = require('fs');
+var bitcore = require('@runonflux/bitcore-lib');
 var chai = require('chai');
 var should = chai.should();
 
@@ -60,7 +60,7 @@ describe('Bitcoin Cluster', function() {
         '--conf=' + nodeConf.conf
       ];
 
-      rimraf(path.resolve(nodeConf.datadir, './regtest'), function(err) {
+      fs.rm(path.resolve(nodeConf.datadir, './regtest'), {recursive: true, force: true}, function(err) {
         if (err) {
           return done(err);
         }
